@@ -1,40 +1,136 @@
 import time
-import os
 
-def slow_print(text):
+def type_effect(text, delay=0.03):
+    """Simulates typing effect for text"""
     for char in text:
         print(char, end='', flush=True)
-        time.sleep(0.03)
+        time.sleep(delay)
     print()
 
-def clear_screen():
-    os.system('cls' if os.name == 'nt' else 'clear')
+def display_intro():
+    """Shows game introduction"""
+    type_effect("=" * 50)
+    type_effect("          BUHAY PROBINSYANO: ANG HIRAP!          ")
+    type_effect("=" * 50)
+    type_effect("\nSimula ka may 150 pesos. Kailangan mong mamili ng gagawin")
+    type_effect("sa umaga, tanghalian, at gabi para maka-survive ka.\n")
+    type_effect("Mag-ingat sa paggastos—baka maubos ang pera mo!\n")
 
-def story():
-    clear_screen()
-    print("===== THE LOST CITY =====")
+def scene_morning(money):
+    """Morning scene choices"""
+    type_effect("\n--- UMAGA ---")
+    type_effect(f"Kasalukuyang pera mo: ₱{money}")
+    type_effect("\nAnong gagawin mo sa umaga?")
+    type_effect("1. Magtinda ng kakanin (+₱50 pero gastos ₱20)")
+    type_effect("2. Magtrabaho sa bukid (+₱30 walang gastos)")
+    type_effect("3. Matulog lang (walang kita, walang gastos)")
     
-    slow_print("\nYou are an explorer searching for the legendary city of gold.")
-    slow_print("You stand before two ancient gates...")
+    while True:
+        choice = input("Piliin ang numero (1-3): ")
+        if choice in ["1","2","3"]:
+            break
+        type_effect("Mali! Pumili ka lang ng 1, 2, o 3.\n")
     
-    choice = input("\n(A) Enter the Golden Gate  (B) Enter the Stone Gate: ").upper()
-
-    if choice == "A":
-        slow_print("\n✨ The gate glows! You find the treasure!")
-        return "WIN"
+    if choice == "1":
+        earn = 50
+        cost = 20
+        money += earn - cost
+        type_effect(f"\nNagtinda ka! Kumita ka ng ₱{earn} pero gumastos ng ₱{cost}.")
+    elif choice == "2":
+        earn = 30
+        money += earn
+        type_effect(f"\nNagtrabaho ka sa bukid! Kumita ka ng ₱{earn}.")
     else:
-        slow_print("\n🚪 The gate is trapped! You barely escape empty-handed.")
-        return "LOSE"
+        type_effect("\nNatulog ka lang buong umaga. Walang kita, walang gastos.")
+    
+    return choice, money
 
-playing = True
-while playing:
-    ending = story()
+def scene_lunch(money, morning_choice):
+    """Lunch scene choices"""
+    type_effect("\n--- TANGHALIAN ---")
+    type_effect(f"Kasalukuyang pera mo: ₱{money}")
+    type_effect("\nAnong kakainin mo?")
+    type_effect("1. Lugaw at itlog (-₱25)")
+    type_effect("2. Kanin at tuyo (-₱15)")
+    type_effect("3. Tubig lang (libre)")
     
-    if ending == "WIN":
-        print("\n🏆 GOOD ENDING: LEGENDARY EXPLORER")
+    while True:
+        choice = input("Piliin ang numero (1-3): ")
+        if choice in ["1","2","3"]:
+            break
+        type_effect("Mali! Pumili ka lang ng 1, 2, o 3.\n")
+    
+    if choice == "1":
+        cost = 25
+        money -= cost
+        type_effect(f"\nKumain ka ng lugaw at itlog. Nabawas ng ₱{cost} ang pera mo.")
+    elif choice == "2":
+        cost = 15
+        money -= cost
+        type_effect(f"\nKumain ka ng kanin at tuyo. Nabawas ng ₱{cost} ang pera mo.")
     else:
-        print("\n⚠️ BAD ENDING: RETURN HOME")
+        type_effect("\nTubig lang ang ininom mo. Buti na lang libre!")
     
-    if input("\nPlay again? (Y/N): ").upper() != 'Y':
-        playing = False
-        print("\nThanks for reading!")
+    return choice, money
+
+def scene_evening(money, morning_choice):
+    """Evening scene choices"""
+    type_effect("\n--- GABI ---")
+    type_effect(f"Kasalukuyang pera mo: ₱{money}")
+    type_effect("\nAnong gagawin mo sa gabi?")
+    type_effect("1. Manood ng TV sa kapitbahay (libre)")
+    type_effect("2. Magbasa ng libro (libre)")
+    type_effect("3. Uminom ng alak (-₱50)")
+    
+    while True:
+        choice = input("Piliin ang numero (1-3): ")
+        if choice in ["1","2","3"]:
+            break
+        type_effect("Mali! Pumili ka lang ng 1, 2, o 3.\n")
+    
+    if choice == "3":
+        cost = 50
+        money -= cost
+        type_effect(f"\nUminom ka ng alak. Nabawas ng ₱{cost} ang pera mo.")
+    else:
+        type_effect("\nGinawa mo lang ang gusto mo nang walang gastos.")
+    
+    return choice, money
+
+def trigger_ending(money):
+    """Shows ending based on remaining money"""
+    type_effect("\n" + "=" * 50)
+    type_effect("               WAKAS NG LARO               ")
+    type_effect("=" * 50)
+    type_effect(f"\nNatapos ang araw at may natitira kang ₱{money}.")
+    
+    if money > 100:
+        type_effect("\n🎉 MAGALING! Nakaipon ka pa! Swerte mo naman ngayon.")
+    elif money > 50:
+        type_effect("\n😐 OKAY LANG. Nakaraos ka pero wala masyadong natira.")
+    elif money > 0:
+        type_effect("\n😰 HALOS MAUBOS! Buti na lang may natitira pa.")
+    else:
+        type_effect("\n💸 UBOS ANG PERA! Sayang, kailangan mong magbanat ulit bukas.")
+
+def play_game():
+    while True:
+        initial_money = 150  # Starting money
+        current_money = initial_money
+
+        display_intro()
+
+        # Track choices and money
+        morning_choice, current_money = scene_morning(current_money)
+        lunch_choice, current_money = scene_lunch(current_money, morning_choice)
+        evening_choice, current_money = scene_evening(current_money, morning_choice)
+
+        trigger_ending(current_money)
+
+        retry = input("\nGusto mo bang ulitin ang hirap ng buhay? (Y/N): ").upper()
+        if retry != 'Y':
+            type_effect("\nPaalam! Kita-kits sa Sweldo Day! 👋")
+            break
+
+if __name__ == "__main__":
+    play_game()
