@@ -1,0 +1,40 @@
+import time
+import os
+
+def slow_print(text):
+    for char in text:
+        print(char, end='', flush=True)
+        time.sleep(0.03)
+    print()
+
+def clear_screen():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+def story():
+    clear_screen()
+    print("===== THE LOST CITY =====")
+    
+    slow_print("\nYou are an explorer searching for the legendary city of gold.")
+    slow_print("You stand before two ancient gates...")
+    
+    choice = input("\n(A) Enter the Golden Gate  (B) Enter the Stone Gate: ").upper()
+
+    if choice == "A":
+        slow_print("\n✨ The gate glows! You find the treasure!")
+        return "WIN"
+    else:
+        slow_print("\n🚪 The gate is trapped! You barely escape empty-handed.")
+        return "LOSE"
+
+playing = True
+while playing:
+    ending = story()
+    
+    if ending == "WIN":
+        print("\n🏆 GOOD ENDING: LEGENDARY EXPLORER")
+    else:
+        print("\n⚠️ BAD ENDING: RETURN HOME")
+    
+    if input("\nPlay again? (Y/N): ").upper() != 'Y':
+        playing = False
+        print("\nThanks for reading!")
